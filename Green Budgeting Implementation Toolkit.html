@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OECD Green Budgeting Toolkit (Enhanced Version)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/html-docx-js/dist/html-docx.js"></script>
+    
+    <style>
+        body { 
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+        
+        .main-container {
+            background: white;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Improved Textarea */
+        textarea.worksheet-input { 
+            margin-top: 0.5rem;
+            padding: 1rem;
+            display: block;
+            width: 100%; 
+            border-radius: 0.5rem;
+            border: 2px solid #e2e8f0;
+            font-size: 0.95rem; 
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+            min-height: 120px;
+            resize: vertical;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        textarea.worksheet-input:focus { 
+            border-color: #10b981;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            background-color: white;
+        }
+        
+        textarea.worksheet-input:hover {
+            border-color: #059669;
+        }
+        
+        /* Modern Tab Buttons */
+        .tab-buttons { 
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            padding: 0.5rem;
+            background: #f8fafc;
+            border-radius: 1rem;
+        }
+
+        .tab-btn { 
+            flex: 1;
+            min-width: 180px;
+            padding: 1rem 1.25rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 0.75rem;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+        
+        .tab-btn.active { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+        }
+        
+        .tab-btn.inactive { 
+            color: #64748b;
+            background: white;
+        }
+        
+        .tab-btn.inactive:hover { 
+            color: #334155;
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            transform: translateY(-1px);
+        }
+        
+        .tab-content { 
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .tab-content.active { 
+            display: block;
+        }
+        
+        @keyframes fadeIn { 
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            } 
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            } 
+        }
+        
+        /* Improved Focus Block */
+        .stage-focus { 
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid #6ee7b7;
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+        
+        .stage-focus h3 { 
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .stage-focus ul { 
+            list-style: none;
+            margin-left: 0;
+            color: #047857;
+            font-size: 0.95rem;
+        }
+        
+        .stage-focus li {
+            padding-left: 1.5rem;
+            position: relative;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stage-focus li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .stage-section { 
+            margin-bottom: 3rem;
+            padding-top: 1rem;
+        }
+        
+        .stage-title { 
+            font-size: 2rem;
+            font-weight: 700;
+            color: #065f46;
+            border-bottom: 3px solid #10b981;
+            padding-bottom: 0.75rem;
+            margin-bottom: 2rem;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .tool-block { 
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: #fafafa;
+            border-radius: 1rem;
+            border-left: 4px solid #10b981;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-block:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateX(4px);
+        }
+        
+        .tool-label { 
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tool-description { 
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+        
+        .sub-label { 
+            font-size: 1rem;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .grid-container { 
+            margin-top: 1rem;
+        }
+        
+        .grid-2-col { 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Improved Export Button */
+        .export-btn { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .export-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s ease;
+        }
+        
+        .export-btn:hover:before {
+            left: 100%;
+        }
+        
+        .export-btn:hover { 
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4);
+        }
+        
+        .export-btn:active { 
+            transform: translateY(-1px);
+        }
+        
+        @media print { 
+            .no-print { 
+                display: none;
+            }
+        }
+        
+        /* Improved Analysis Page */
+        .analysis-section { 
+            margin-bottom: 2.5rem;
+        }
+        
+        .analysis-h2 { 
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 1rem;
+            border-left: 5px solid #10b981;
+            padding-left: 1rem;
+        }
+        
+        .analysis-h3 { 
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .analysis-p { 
+            color: #475569;
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+        
+        .analysis-ul { 
+            list-style: disc;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+        
+        .analysis-tool { 
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .analysis-tool:hover {
+            border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+        
+        .analysis-tool strong { 
+            color: #047857;
+            font-size: 1.1rem;
+        }
+        
+        /* Progress Indicator */
+        .progress-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 1000;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Responsive Improvements */
+        @media (max-width: 768px) {
+            .tab-btn {
+                min-width: 100%;
+            }
+            
+            .grid-2-col {
+                grid-template-columns: 1fr;
+            }
+            
+            .stage-title {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Loading Spinner */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 to-teal-50">
+
+    <div class="progress-indicator">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div class="container mx-auto max-w-screen-xl p-4 sm:p-6 lg:p-10 main-container rounded-3xl my-8 lg:my-12">
+
+        <div class="mb-8 no-print">
+             <nav class="tab-buttons" aria-label="Tabs">
+                <button id="tab-btn-intro" class="tab-btn active">📚 Introduction & Framework</button>
+                <button id="tab-btn-block1" class="tab-btn inactive">🏛️ Pillar 1: Institutional Arrangements</button>
+                <button id="tab-btn-block2" class="tab-btn inactive">🛠️ Pillar 2: Methods & Tools</button>
+                <button id="tab-btn-block3" class="tab-btn inactive">👁️ Pillar 3: Accountability & Transparency</button>
+                <button id="tab-btn-block4" class="tab-btn inactive">🌱 Pillar 4: Enabling Environment</button>
+            </nav>
+        </div>
+        
+         <div class="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 p-6 rounded-xl border-2 border-emerald-200">
+            <h2 class="text-2xl font-bold text-emerald-800 mb-4">📋 Basic Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="ws-country" class="block text-sm font-semibold text-emerald-700 mb-2">
+                        🌍 Country / Region
+                    </label>
+                    <input type="text" id="ws-country" class="w-full px-4 py-3 rounded-lg border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-100 transition-all" placeholder="e.g., United Kingdom, France, Japan...">
+                </div>
+                <div>
+                    <label for="ws-topic" class="block text-sm font-semibold text-emerald-700 mb-2">
+                        🏢 Organization / Government
+                    </label>
+                    <input type="text" id="ws-topic" class="w-full px-4 py-3 rounded-lg border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-100 transition-all" placeholder="Enter the name of the ministry, agency, or government...">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="ws-assessor" class="block text-sm font-semibold text-emerald-700 mb-2">
+                        👤 Assessor
+                    </label>
+                    <input type="text" id="ws-assessor" class="w-full px-4 py-3 rounded-lg border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-100 transition-all" placeholder="Please enter your name...">
+                </div>
+                <div>
+                    <label for="ws-date" class="block text-sm font-semibold text-emerald-700 mb-2">
+                        📅 Assessment Date
+                    </label>
+                    <input type="date" id="ws-date" class="w-full px-4 py-3 rounded-lg border-2 border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-100 transition-all">
+                </div>
+            </div>
+        </div>
+        <hr class="my-8 border-slate-300">
+
+
+        <div id="tab-content-intro" class="tab-content active">
+             <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-8 pb-6 border-b-2 border-slate-200 text-center bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+                Green Budgeting Implementation Toolkit
+            </h1>
+            <p class="analysis-p mb-10 text-lg">This tool is designed to help governments and public institutions assess and develop their green budgeting practices, based on the <strong>OECD Green Budgeting Framework</strong>. Green budgeting is a tool to integrate climate and environmental goals into the budget process.</p>
+
+            <section class="analysis-section">
+                <h2 class="analysis-h2">What is Green Budgeting?</h2>
+                <p class="analysis-p">The OECD defines green budgeting as "the use of budgetary policymaking tools to pursue climate and environmental objectives." It is about systematically integrating climate and environmental considerations into the government's budgetary and fiscal frameworks, policies, and practices.</p>
+                <p class="analysis-p">The purpose is to enable governments to promote climate and environmental objectives through resource allocations and to better understand the implications of climate policies on budget sustainability.</p>
+            </section>
+            
+            <section class="analysis-section">
+                <h2 class="analysis-h2">The OECD's Four Pillars</h2>
+                <p class="analysis-p mb-6">This tool is structured around the four pillars of the OECD framework. Use the next tabs to conduct a self-assessment of your organization's current status for each pillar.</p>
+                <div class="analysis-tool">
+                    <strong>🏛️ Pillar 1: Institutional Arrangements</strong><br>
+                    <span class="text-sm">Defines the overall framework and foundation for green budgeting, including national strategies, legal basis, and governance structures.</span>
+                </div>
+                <div class="analysis-tool">
+                    <strong>🛠️ Pillar 2: Methods & Tools</strong><br>
+                    <span class="text-sm">The specific instruments used to analyze and integrate green considerations, such as impact assessments, green 'tagging,' and carbon pricing.</span>
+                </div>
+                 <div class="analysis-tool">
+                    <strong>👁️ Pillar 3: Accountability & Transparency</strong><br>
+                    <span class="text-sm">Ensures that implementation is monitored, reported, and audited, and that information is publicly available.</span>
+                </div>
+                 <div class="analysis-tool">
+                    <strong>🌱 Pillar 4: Enabling Environment</strong><br>
+                    <span class="text-sm">The supporting systems and capacities needed, such as integration with performance budgeting, cross-ministerial coordination, and skills development.</span>
+                </div>
+            </section>
+        </div>
+        
+        <div id="tab-content-block1" class="tab-content">
+            <section class="stage-section">
+                <h2 class="stage-title">🏛️ Pillar 1: Institutional Arrangements</h2>
+                
+                <div class="stage-focus">
+                    <h3>🎯 Focus of this Pillar</h3>
+                     <ul>
+                        <li><strong>Core Purpose:</strong> To establish the overall foundation and framework for how ministries and agencies should develop and apply green budgeting.</li>
+                        <li><strong>Key Elements:</strong> National strategies, legal basis, governance arrangements, and integration into the political decision-making process.</li>
+                    </ul>
+                </div>
+
+                <div class="tool-block">
+                    <label class="tool-label">📋 National Strategies and Goals</label>
+                    <p class="tool-description">Assess the alignment between the budget process and overarching climate and environmental strategies.</p>
+                    <div class="grid-container grid-2-col">
+                        <div class="input-group">
+                            <label for="b1-strategy" class="sub-label">National Climate/Environmental Strategy</label>
+                            <textarea id="b1-strategy" class="worksheet-input" placeholder="Describe the national strategy. Is it aligned with the country's 'Nationally Determined Contributions' (NDCs)?"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="b1-netzero" class="sub-label">Net-Zero Emissions Strategy</label>
+                            <textarea id="b1-netzero" class="worksheet-input" placeholder="Is there a net-zero strategy? Does it include targets/milestones? Is there a specific date for the public sector?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tool-block">
+                    <label class="tool-label">⚖️ Legal Basis and Governance</label>
+                    <p class="tool-description">Define the formal authority and division of responsibilities for green budgeting.</p>
+                    <div class="grid-container grid-2-col">
+                        <div class="input-group">
+                            <label for="b1-legal" class="sub-label">Legal Basis</label>
+                            <textarea id="b1-legal" class="worksheet-input" placeholder="What is the legal basis? (e.g., Budget Law, other legislation, administrative practice/circulars)"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="b1-governance" class="sub-label">Governance Arrangements</label>
+                            <textarea id="b1-governance" class="worksheet-input" placeholder="Which ministry leads the process (typically Ministry of Finance)? Are there specialized agencies or green funds?"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="tool-block">
+                    <label class="tool-label">🔗 Integration and Scope</label>
+                    <p class="tool-description">Describe how and where in the budget process green budgeting is applied.</p>
+                     <div class="grid-container grid-2-col">
+                         <div class="input-group">
+                            <label for="b1-decision" class="sub-label">Integration in Decision-Making</label>
+                            <textarea id="b1-decision" class="worksheet-input" placeholder="How is it used in practice? (e.g., To inform political decisions, guide budget negotiations, prioritize capital investments)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b1-scope" class="sub-label">Scope (Expenditure)</label>
+                            <textarea id="b1-scope" class="worksheet-input" placeholder="Which expenditure types are covered? (e.g., Capital investments, discretionary spending, mandatory spending, operational spending, tax expenditures)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b1-objectives" class="sub-label">Environmental Objectives Covered</label>
+                            <textarea id="b1-objectives" class="worksheet-input" placeholder="Which objectives are integrated? (e.g., Climate adaptation, climate mitigation, biodiversity, pollution, water/sea, circular economy)"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div id="tab-content-block2" class="tab-content">
+             <section class="stage-section">
+                <h2 class="stage-title">🛠️ Pillar 2: Methods & Tools</h2>
+                 <div class="stage-focus">
+                    <h3>🎯 Focus of this Pillar</h3>
+                    <ul>
+                        <li><strong>Core Purpose:</strong> To develop and apply concrete instruments to analyze and visualize climate and environmental considerations for decision-makers.</li>
+                        <li><strong>Key Elements:</strong> Impact assessments, 'green tagging,' carbon budgets, tax analyses, and green finance tools.</li>
+                    </ul>
+                </div>
+
+                <div class="tool-block">
+                    <label class="tool-label">🔍 Assessment & Classification Tools</label>
+                    <p class="tool-description">Tools to identify, classify, and evaluate the environmental impact of budget measures.</p>
+                     <div class="grid-container grid-2-col">
+                        <div class="input-group">
+                            <label for="b2-tagging" class="sub-label">Green Budget Tagging</label>
+                            <textarea id="b2-tagging" class="worksheet-input" placeholder="Describe the methodology/taxonomy used to 'tag' expenditures (green, brown, neutral). Is it applied ex-ante or ex-post?"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-impact" class="sub-label">Environmental Impact Assessments</label>
+                            <textarea id="b2-impact" class="worksheet-input" placeholder="Are ex-ante or ex-post environmental impact assessments required for major projects or policies?"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-cba" class="sub-label">Environmental Cost-Benefit Analysis (CBA)</label>
+                            <textarea id="b2-cba" class="worksheet-input" placeholder="How is CBA adapted to include environmental factors (e.g., externalities, ecosystem services)? Is it widely used?"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-spending-review" class="sub-label">Green Perspective in Spending Reviews</label>
+                            <textarea id="b2-spending-review" class="worksheet-input" placeholder="How are climate/environmental objectives integrated into spending reviews? (e.g., Austria's model)"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="tool-block">
+                    <label class="tool-label">🌡️ Carbon-Specific Tools</label>
+                    <p class="tool-description">Tools focused on pricing, measuring, and budgeting for carbon emissions.</p>
+                    <div class="grid-container grid-2-col">
+                         <div class="input-group">
+                            <label for="b2-carbon-pricing" class="sub-label">Carbon Pricing Instruments</label>
+                            <textarea id="b2-carbon-pricing" class="worksheet-input" placeholder="Describe the instruments in place: Carbon Tax? Emissions Trading System (ETS)? Fuel taxes?"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-shadow-price" class="sub-label">Shadow Price of Carbon</label>
+                            <textarea id="b2-shadow-price" class="worksheet-input" placeholder="Is a shadow price of carbon used to evaluate public policies and investments? What is the value and how is it applied?"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-carbon-assessment" class="sub-label">Carbon Assessment of Budget Measures</label>
+                            <textarea id="b2-carbon-assessment" class="worksheet-input" placeholder="Is there a process to assess the specific carbon footprint (GHG emissions) of new budget proposals?"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="b2-carbon-budget" class="sub-label">Carbon Budgets</label>
+                            <textarea id="b2-carbon-budget" class="worksheet-input" placeholder="Is an economy-wide carbon budget system in place (e.g., Ireland's model)? How does it link to the fiscal budget?"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="tool-block">
+                    <label class="tool-label">💰 Fiscal, Financial & Revenue Tools</label>
+                    <p class="tool-description">Tools related to the revenue side of the budget and the use of financial instruments.</p>
+                    <div class="grid-container grid-2-col">
+                         <div class="input-group">
+                            <label for="b2-tax-reform" class="sub-label">Environmental Tax Reform</label>
+                            <textarea id="b2-tax-reform" class="worksheet-input" placeholder="Describe any comprehensive green tax reforms undertaken."></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-harmful-review" class="sub-label">Review of Harmful Subsidies & Tax Expenditures</label>
+                            <textarea id="b2-harmful-review" class="worksheet-input" placeholder="Is there a regular review to identify and quantify environmentally harmful subsidies and/or tax expenditures?"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-green-bonds" class="sub-label">Sovereign Green Bonds</label>
+                            <textarea id="b2-green-bonds" class="worksheet-input" placeholder="Describe the Sovereign Green Bond framework. How are proceeds allocated, managed, and reported?"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="b2-sustainability-loans" class="sub-label">Sustainability Loans</label>
+                            <textarea id="b2-sustainability-loans" class="worksheet-input" placeholder="Are sustainability loans or other green financing mechanisms (e.g., green funds) in use?"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-block">
+                    <label class="tool-label">📊 Macro-Level & Planning Tools</label>
+                    <p class="tool-description">Tools that integrate green perspectives into high-level fiscal planning and risk management.</p>
+                    <div class="grid-container grid-2-col">
+                         <div class="input-group">
+                            <label for="b2-macro-fiscal" class="sub-label">Green Perspective in Macro-Fiscal Projections</label>
+                            <textarea id="b2-macro-fiscal" class="worksheet-input" placeholder="How are climate variables (e.g., carbon tax revenue, transition costs) integrated into economic forecasts? (e.g., Denmark's GreenREFORM model)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-risk-analysis" class="sub-label">Green Perspective in Fiscal Risk Analysis</label>
+                            <textarea id="b2-risk-analysis" class="worksheet-input" placeholder="How are climate-related risks (physical and transition) included in the government's fiscal risk statement? (e.g., UK's Risk Assessment)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b2-mtef" class="sub-label">Green Perspective in Multi-Annual Budgets</label>
+                            <textarea id="b2-mtef" class="worksheet-input" placeholder="How are green goals and spending plans reflected in medium-term expenditure frameworks (MTEFs)?"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div id="tab-content-block3" class="tab-content">
+             <section class="stage-section">
+                <h2 class="stage-title">👁️ Pillar 3: Accountability & Transparency</h2>
+                 <div class="stage-focus">
+                    <h3>🎯 Focus of this Pillar</h3>
+                    <ul>
+                         <li><strong>Core Purpose:</strong> To ensure that the implementation of green budgeting is monitored, reported, and that the process and results are transparent to the public and oversight bodies.</li>
+                        <li><strong>Key Elements:</strong> Implementation monitoring, public reporting, independent oversight, and civil society engagement.</li>
+                    </ul>
+                </div>
+
+                <div class="tool-block">
+                    <label class="tool-label">📈 Monitoring and Reporting</label>
+                    <p class="tool-description">Tracking implementation and communicating results.</p>
+                     <div class="grid-container grid-2-col">
+                        <div class="input-group">
+                            <label for="b3-monitoring" class="sub-label">Monitoring of Implementation</label>
+                            <textarea id="b3-monitoring" class="worksheet-input" placeholder="How is implementation monitored? (e.g., Via 'climate tracking' indicators, green performance indicators, regular reporting from ministries)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b3-reporting" class="sub-label">Public Reporting</label>
+                            <textarea id="b3-reporting" class="worksheet-input" placeholder="How is it reported publicly? (e.g., A separate 'Green Budget Statement' to parliament, integrated into the budget proposal)"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="tool-block">
+                    <label class="tool-label">🔎 Oversight</label>
+                    <p class="tool-description">The role of independent institutions in auditing green budgeting.</p>
+                    <div class="grid-container grid-2-col">
+                         <div class="input-group">
+                            <label for="b3-oversight" class="sub-label">Role of Oversight Bodies</label>
+                            <textarea id="b3-oversight" class="worksheet-input" placeholder="What role do independent bodies play? (e.g., Fiscal Councils, Climate Councils, Supreme Audit Institutions)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b3-oversight-tasks" class="sub-label">Oversight Tasks</label>
+                            <textarea id="b3-oversight-tasks" class="worksheet-input" placeholder="What are their tasks? (e.g., Monitor compliance with reporting requirements, monitor green investment targets, assess/cost new initiatives)"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="tool-block">
+                    <label class="tool-label">🌐 Transparency and Engagement</label>
+                    <p class="tool-description">Ensuring public access and participation.</p>
+                     <div class="grid-container grid-2-col">
+                        <div class="input-group">
+                            <label for="b3-civil" class="sub-label">Civil Society Engagement</label>
+                            <textarea id="b3-civil" class="worksheet-input" placeholder="How is civil society involved? (e.g., Structured dialogues, public hearings, citizens' assemblies)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b3-public" class="sub-label">Public Availability</label>
+                            <textarea id="b3-public" class="worksheet-input" placeholder="Is information on green budgeting published on an open and accessible platform?"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <div id="tab-content-block4" class="tab-content">
+             <section class="stage-section">
+                <h2 class="stage-title">🌱 Pillar 4: Enabling Environment</h2>
+                 <div class="stage-focus">
+                    <h3>🎯 Focus of this Pillar</h3>
+                     <ul>
+                        <li><strong>Core Purpose:</strong> To leverage and adapt existing budget frameworks and build the necessary capacity and coordination to support implementation.</li>
+                        <li><strong>Key Elements:</strong> Link to performance and programme budgeting, cross-ministerial coordination, and skills and capacity building.</li>
+                    </ul>
+                </div>
+
+                 <div class="tool-block">
+                    <label class="tool-label">🔗 Integration with Existing Budget Systems</label>
+                    <p class="tool-description">Leverage existing frameworks for performance and programme management.</p>
+                     <div class="grid-container grid-2-col">
+                        <div class="input-group">
+                            <label for="b4-performance" class="sub-label">Link to Performance Budgeting & Indicators</label>
+                            <textarea id="b4-performance" class="worksheet-input" placeholder="How is performance budgeting linked to green goals? Describe any specific 'Green Performance Indicators' that are set, monitored, and reported (e.g., France's model)."></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label for="b4-programme" class="sub-label">Link to Programme Budgeting</label>
+                            <textarea id="b4-programme" class="worksheet-input" placeholder="Is programme budgeting in use and linked to green budgeting? (e.g., by using the existing budget structure to apply green objectives)"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="tool-block">
+                    <label class="tool-label">🤝 Coordination and Capacity</label>
+                    <p class="tool-description">Ensure the necessary cross-ministerial coordination and the right skills.</p>
+                      <div class="grid-container grid-2-col">
+                         <div class="input-group">
+                            <label for="b4-coordination" class="sub-label">Coordination Mechanisms</label>
+                            <textarea id="b4-coordination" class="worksheet-input" placeholder="What mechanisms are in place? (e.g., Inter-ministerial working groups, formal coordination between Ministry of Finance and Ministry of Environment)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b4-capacity" class="sub-label">Skills and Capacity Building</label>
+                            <textarea id="b4-capacity" class="worksheet-input" placeholder="What training and skills development is taking place? (e.g., Training for Ministry of Finance staff, training for line ministries)"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="tool-block">
+                    <label class="tool-label">⚠️ Challenges and Responses</label>
+                    <p class="tool-description">Identify barriers and strategies to overcome them (based on OECD survey).</p>
+                     <div class="grid-container grid-2-col">
+                        <div class="input-group">
+                            <label for="b4-challenges" class="sub-label">Identified Challenges</label>
+                            <textarea id="b4-challenges" class="worksheet-input" placeholder="What are the primary challenges? (e.g., Lack of resources (time, staff), lack of technical expertise, poor data availability, lack of indicators)"></textarea>
+                        </div>
+                         <div class="input-group">
+                            <label for="b4-responses" class="sub-label">Strategies to Overcome Challenges</label>
+                            <textarea id="b4-responses" class="worksheet-input" placeholder="What solutions are being implemented? (e.g., Integrate into the main budget process, consult external experts, collaborate with statistical organizations)"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="text-center mt-12 no-print">
+            <div class="flex flex-wrap justify-center gap-4 mb-6">
+                <button id="exportJsonButton" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-8 py-3 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all hover:shadow-lg">
+                    💾 Export JSON Data
+                </button>
+                <label for="importJsonFile" class="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 px-8 py-3 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-all hover:shadow-lg cursor-pointer">
+                    📂 Import JSON Data
+                </label>
+                <input type="file" id="importJsonFile" accept=".json" class="hidden">
+            </div>
+            <button id="exportButton" class="export-btn px-10 py-4 text-white font-bold rounded-xl shadow-lg focus:outline-none focus:ring-4 focus:ring-emerald-300 text-lg">
+                <span id="exportText">🚀 Export Self-Assessment as Word (.docx)</span>
+                <span id="exportLoading" class="loading hidden"></span>
+            </button>
+            <p class="mt-4 text-sm text-slate-500">Export JSON to save all entries. Import JSON to load a previous assessment.</p>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // --- Element Selection ---
+        const tabs = {
+            intro: { btn: document.getElementById('tab-btn-intro'), content: document.getElementById('tab-content-intro') },
+            block1: { btn: document.getElementById('tab-btn-block1'), content: document.getElementById('tab-content-block1') },
+            block2: { btn: document.getElementById('tab-btn-block2'), content: document.getElementById('tab-content-block2') },
+            block3: { btn: document.getElementById('tab-btn-block3'), content: document.getElementById('tab-content-block3') },
+            block4: { btn: document.getElementById('tab-btn-block4'), content: document.getElementById('tab-content-block4') }
+        };
+        const exportButton = document.getElementById('exportButton');
+        const exportJsonButton = document.getElementById('exportJsonButton');
+        const importJsonFile = document.getElementById('importJsonFile');
+        const exportText = document.getElementById('exportText');
+        const exportLoading = document.getElementById('exportLoading');
+        const wsCountry = document.getElementById('ws-country');
+        const wsTopic = document.getElementById('ws-topic');
+        const wsAssessor = document.getElementById('ws-assessor');
+        const wsDate = document.getElementById('ws-date');
+        const progressBar = document.getElementById('progressBar');
+        
+        // Set default date to today
+        wsDate.valueAsDate = new Date();
+        
+        // --- Progress Bar Update ---
+        function updateProgressBar() {
+            const allTextareas = document.querySelectorAll('textarea.worksheet-input');
+            const filledTextareas = Array.from(allTextareas).filter(ta => ta.value.trim() !== '');
+            const progress = (filledTextareas.length / allTextareas.length) * 100;
+            progressBar.style.width = progress + '%';
+        }
+        
+        // Listen to all textarea changes
+        document.querySelectorAll('textarea.worksheet-input, input[type="text"], input[type="date"]').forEach(input => {
+            input.addEventListener('input', updateProgressBar);
+        });
+        
+        // --- Tab Switching Logic ---
+        function setActiveTab(activeTabName) {
+            Object.keys(tabs).forEach(tabName => {
+                const is_active = tabName === activeTabName;
+                if (tabs[tabName].btn) {
+                    tabs[tabName].btn.classList.toggle('active', is_active);
+                    tabs[tabName].btn.classList.toggle('inactive', !is_active);
+                }
+                if (tabs[tabName].content) {
+                    tabs[tabName].content.classList.toggle('active', is_active);
+                }
+            });
+        }
+
+        Object.keys(tabs).forEach(tabName => {
+            if (tabs[tabName].btn) {
+                tabs[tabName].btn.addEventListener('click', (e) => setActiveTab(tabName));
+            }
+        });
+
+        // --- JSON Export Logic ---
+        exportJsonButton.addEventListener('click', function() {
+            try {
+                const data = {
+                    metadata: {
+                        country: wsCountry.value,
+                        organization: wsTopic.value,
+                        assessor: wsAssessor.value,
+                        date: wsDate.value,
+                        exportDate: new Date().toISOString(),
+                        version: '1.0'
+                    },
+                    assessments: {}
+                };
+                
+                // Collect all textarea values
+                document.querySelectorAll('textarea.worksheet-input').forEach(textarea => {
+                    if (textarea.id) {
+                        data.assessments[textarea.id] = textarea.value;
+                    }
+                });
+                
+                // Create and download JSON file
+                const jsonStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const filename = `Green_Budgeting_Assessment_${wsCountry.value || 'Untitled'}_${wsDate.value || new Date().toISOString().split('T')[0]}.json`;
+                saveAs(blob, filename);
+                
+                alert('✅ JSON data exported successfully!');
+            } catch (error) {
+                console.error('Export JSON Failed:', error);
+                alert('❌ An error occurred while exporting JSON. See console for details.');
+            }
+        });
+        
+        // --- JSON Import Logic ---
+        importJsonFile.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    
+                    // Validate JSON structure
+                    if (!data.metadata || !data.assessments) {
+                        throw new Error('Invalid JSON format');
+                    }
+                    
+                    // Load metadata
+                    if (data.metadata.country) wsCountry.value = data.metadata.country;
+                    if (data.metadata.organization) wsTopic.value = data.metadata.organization;
+                    if (data.metadata.assessor) wsAssessor.value = data.metadata.assessor;
+                    if (data.metadata.date) wsDate.value = data.metadata.date;
+                    
+                    // Load assessments
+                    Object.keys(data.assessments).forEach(id => {
+                        const textarea = document.getElementById(id);
+                        if (textarea) {
+                            textarea.value = data.assessments[id];
+                        }
+                    });
+                    
+                    updateProgressBar();
+                    alert('✅ JSON data imported successfully!');
+                    
+                    // Reset file input
+                    e.target.value = '';
+                } catch (error) {
+                    console.error('Import JSON Failed:', error);
+                    alert('❌ Error importing JSON: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // --- Word Export Logic ---
+        exportButton.addEventListener('click', function() {
+            try {
+                // Show loading state
+                exportText.classList.add('hidden');
+                exportLoading.classList.remove('hidden');
+                exportButton.disabled = true;
+                
+                const exportWrapper = document.createElement('div');
+                const mainTitleText = "Green Budgeting Self-Assessment Worksheet";
+
+                // 1. Add Main Title
+                const titleH1 = document.createElement('h1');
+                titleH1.textContent = mainTitleText;
+                exportWrapper.appendChild(titleH1);
+
+                // 2. Add Metadata
+                const metadataDiv = document.createElement('div');
+                metadataDiv.setAttribute('style', 'text-align: center; margin-bottom: 30px; color: #666; border-bottom: 1px solid #ddd; padding-bottom: 15px;');
+                
+                const metadataTable = document.createElement('table');
+                metadataTable.setAttribute('style', 'margin: 0 auto; text-align: left; border-collapse: collapse;');
+                
+                const metadataRows = [
+                    ['Country/Region', wsCountry.value || '(Not specified)'],
+                    ['Organization', wsTopic.value || '(Not specified)'],
+                    ['Assessor', wsAssessor.value || '(Not specified)'],
+                    ['Assessment Date', wsDate.value || new Date().toLocaleDateString('en-US')]
+                ];
+                
+                metadataRows.forEach(([label, value]) => {
+                    const tr = document.createElement('tr');
+                    const tdLabel = document.createElement('td');
+                    tdLabel.setAttribute('style', 'padding: 5px 15px 5px 0; font-weight: bold; color: #047857;');
+                    tdLabel.textContent = label + ':';
+                    const tdValue = document.createElement('td');
+                    tdValue.setAttribute('style', 'padding: 5px 0;');
+                    tdValue.textContent = value;
+                    tr.appendChild(tdLabel);
+                    tr.appendChild(tdValue);
+                    metadataTable.appendChild(tr);
+                });
+                
+                metadataDiv.appendChild(metadataTable);
+                exportWrapper.appendChild(metadataDiv);
+                
+                // Helper function to create styled paragraph from textarea
+                function createDataParagraph(textarea) {
+                    const p = document.createElement('p');
+                    p.className = 'data-paragraph';
+                    p.textContent = textarea.value || '(Not filled)'; 
+                    return p;
+                }
+                
+                // 3. Iterate through each stage tab
+                const stageOrder = ['block1', 'block2', 'block3', 'block4'];
+
+                stageOrder.forEach((stageKey, index) => {
+                    const stageTabContent = document.getElementById(`tab-content-${stageKey}`);
+                    if (!stageTabContent) return; 
+
+                    const stageSection = stageTabContent.querySelector('.stage-section');
+                    if (!stageSection) return;
+                    
+                    // Add page break before each pillar (except first)
+                    if (index > 0) {
+                        const pageBreak = document.createElement('p');
+                        pageBreak.setAttribute('style', 'page-break-before: always;');
+                        exportWrapper.appendChild(pageBreak);
+                    }
+                    
+                    // 4. Add Stage Title (H2)
+                    const stageTitle = stageSection.querySelector('.stage-title');
+                    if (stageTitle) {
+                        const stageH2 = document.createElement('h2');
+                        stageH2.textContent = stageTitle.textContent.trim();
+                        exportWrapper.appendChild(stageH2);
+                    }
+                    
+                    // 5. Iterate through each tool block in the stage
+                    stageSection.querySelectorAll('.tool-block').forEach(toolBlock => {
+                        // Add Tool Title (H3)
+                        const toolLabel = toolBlock.querySelector('.tool-label');
+                        if (toolLabel) {
+                            const toolH3 = document.createElement('h3');
+                            toolH3.textContent = toolLabel.textContent.trim();
+                            exportWrapper.appendChild(toolH3);
+                        }
+                        
+                        // Add Tool Description
+                        const toolDescription = toolBlock.querySelector('.tool-description');
+                        if (toolDescription) {
+                            const descP = document.createElement('p');
+                            descP.className = 'tool-description';
+                            descP.textContent = toolDescription.textContent.trim();
+                            exportWrapper.appendChild(descP);
+                        }
+                        
+                        // 6. Process all input groups (whether filled or not)
+                        toolBlock.querySelectorAll('.input-group').forEach(group => {
+                            const subLabel = group.querySelector('.sub-label');
+                            const textarea = group.querySelector('textarea.worksheet-input');
+
+                            if (textarea) {
+                                if (subLabel) {
+                                    const subH4 = document.createElement('h4');
+                                    subH4.textContent = subLabel.textContent.trim();
+                                    exportWrapper.appendChild(subH4);
+                                }
+                                const p = createDataParagraph(textarea);
+                                exportWrapper.appendChild(p);
+                            }
+                        });
+                    });
+                });
+
+                // 7. Define the HTML string for the DOCX file
+                const finalHtmlString = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <style>
+                            /* Styles for the exported Word document */
+                            body { font-family: 'Arial', sans-serif; font-size: 11pt; line-height: 1.6; color: #374151; }
+                            h1 { font-size: 20pt; text-align: center; font-family: 'Arial', sans-serif; font-weight: bold; color: #111827; margin-bottom: 10px;}
+                            h2 { font-size: 16pt; font-weight: bold; color: #065f46; margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid #10b981; padding-bottom: 5px; page-break-after: avoid; }
+                            h3 { font-size: 13pt; font-weight: bold; color: #1f2937; margin-top: 20px; margin-bottom: 8px; page-break-after: avoid; }
+                            h4 { font-size: 11pt; font-weight: bold; color: #475569; margin-top: 12px; margin-bottom: 3px; page-break-after: avoid; }
+                            p { margin-bottom: 12px; white-space: pre-wrap; }
+                            table { border-collapse: collapse; }
+                            td { padding: 5px; }
+                            
+                            p.tool-description {
+                                font-style: italic;
+                                font-size: 10pt;
+                                color: #6b7280;
+                                margin-top: -5px;
+                                margin-bottom: 8px;
+                            }
+                            
+                            p.data-paragraph {
+                                border: 1px solid #d1d5db; 
+                                padding: 10px; 
+                                margin-top: 3px;
+                                margin-bottom: 15px; 
+                                background-color: #f9fafb; 
+                                font-size: 10pt; 
+                                color: #1f2937;
+                                white-space: pre-wrap;
+                                page-break-inside: avoid;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${exportWrapper.innerHTML}
+                    </body>
+                    </html>
+                `;
+
+                // 8. Generate and download the Word file
+                const converted = htmlDocx.asBlob(finalHtmlString, {
+                    orientation: 'portrait',
+                    margins: { top: 720, bottom: 720, left: 720, right: 720 }
+                });
+
+                const filename = `Green_Budgeting_Assessment_${wsCountry.value || 'Untitled'}_${wsDate.value || new Date().toISOString().split('T')[0]}.docx`;
+                saveAs(converted, filename);
+                
+                // Reset button state
+                setTimeout(() => {
+                    exportText.classList.remove('hidden');
+                    exportLoading.classList.add('hidden');
+                    exportButton.disabled = false;
+                }, 1000);
+
+            } catch (error) {
+                console.error("Export Failed:", error);
+                alert("Sorry, an error occurred during export. Please check the console for more information.");
+                exportText.classList.remove('hidden');
+                exportLoading.classList.add('hidden');
+                exportButton.disabled = false;
+            }
+        });
+        
+        // --- Initialize Page ---
+        setActiveTab('intro');
+        updateProgressBar();
+    });
+    </script>
+
+</body>
+</html>
